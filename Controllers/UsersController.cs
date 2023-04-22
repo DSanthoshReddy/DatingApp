@@ -1,43 +1,38 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using API.DbDataContext;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    [Authorize]
+    public class UsersController : BaseApiController
     {
         private readonly ILogger<UsersController> _logger;
         public DataContext _context { get; }
 
-        public UsersController(ILogger<UsersController> logger,DataContext context)
+        public UsersController(ILogger<UsersController> logger, DataContext context)
         {
             _context = context;
-            
+
             _logger = logger;
         }
 
+        [AllowAnonymous]
         [HttpGet("")]
         public async Task<IActionResult> GetUsers()
         {
             DbSet<AppUser> userData = _context.Users;
-            List<AppUser>  allUsers = new List<AppUser>();
+            List<AppUser> allUsers = new List<AppUser>();
 
-            if(userData != null)
+            if (userData != null)
             {
                 allUsers = await userData.ToListAsync();
             }
-          
 
-           return Ok(allUsers);
+
+            return Ok(allUsers);
         }
 
         [HttpGet("{id}")]
